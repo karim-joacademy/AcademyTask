@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Course;
 use App\Models\Student;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CourseStudentSeeder extends Seeder
@@ -19,8 +18,10 @@ class CourseStudentSeeder extends Seeder
 
         $students->each(function ($student) use ($courses) {
             $student->courses()->attach(
-                $courses->random(rand(1, 5))->pluck('id')->toArray()  // Attach 1-5 random course IDs
-            );
+                $courses->random(rand(1, 5))
+                        ->pluck('id')
+                        ->toArray()
+                );
         });
     }
 }

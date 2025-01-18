@@ -5,15 +5,22 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Student;
+use Illuminate\Http\JsonResponse;
 
 class StudentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() : JsonResponse
     {
-        //
+        $students = Student::all();
+
+        if ($students->isEmpty()) {
+            return response()->json(["message" => "No students"], 404);
+        }
+
+        return response()->json($students);
     }
 
     /**
@@ -27,9 +34,11 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Student $student)
+    public function show(Student $student) : JsonResponse
     {
-        //
+        $student->load('courses', 'academy');
+
+        return response()->json($student);
     }
 
     /**

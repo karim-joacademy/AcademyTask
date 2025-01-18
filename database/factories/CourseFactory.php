@@ -4,9 +4,10 @@ namespace Database\Factories;
 
 use App\Models\Teacher;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Course;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Course>
+ * @extends Factory<Course>
  */
 class CourseFactory extends Factory
 {
@@ -20,7 +21,7 @@ class CourseFactory extends Factory
         return [
             'title' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(),
-            'teacher_id' => Teacher::factory(),
+            'teacher_id' => Teacher::factory()
         ];
     }
 }

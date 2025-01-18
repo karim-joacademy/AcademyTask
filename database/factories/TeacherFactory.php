@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\Academy;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Teacher;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Teacher>
+ * @extends Factory<Teacher>
  */
 class TeacherFactory extends Factory
 {
@@ -21,7 +21,7 @@ class TeacherFactory extends Factory
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
-            'academy_id' => Academy::factory(),
+            'academy_id' => 1
         ];
     }
 }

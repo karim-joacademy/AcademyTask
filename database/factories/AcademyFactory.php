@@ -6,7 +6,7 @@ use App\Models\Academy;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<Academy>
+ * @extends Factory<Academy>
  */
 class AcademyFactory extends Factory
 {
@@ -20,7 +20,7 @@ class AcademyFactory extends Factory
         return [
             'name' => $this->faker->company(),
             'email' => $this->faker->unique()->safeEmail(),
-            'phone' => $this->faker->phoneNumber(),
+            'phone' => $this->faker->phoneNumber()
         ];
     }
 }

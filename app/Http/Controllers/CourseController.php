@@ -5,16 +5,24 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Course;
+use Illuminate\Http\JsonResponse;
 
 class CourseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() : JsonResponse
     {
-        //
+        $courses = Course::all();
+
+        if ($courses->isEmpty()) {
+            return response()->json(["message" => "No courses"], 404);
+        }
+
+        return response()->json($courses);
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -27,9 +35,11 @@ class CourseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Course $course)
+    public function show(Course $course) : JsonResponse
     {
-        //
+        $course->load('teacher');
+
+        return response()->json($course);
     }
 
     /**
@@ -43,8 +53,9 @@ class CourseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course)
+    public function destroy(Course $course) : JsonResponse
     {
-        //
+        $course->delete();
+        return response()->json(['message' => 'Course deleted successfully.']);
     }
 }

@@ -11,8 +11,15 @@ class Teacher extends Model
     /** @use HasFactory<TeacherFactory> */
     use HasFactory;
 
+    protected $fillable = [ 'name', 'email', 'phone', 'academy_id' ];
+
     public function academy()
     {
         return $this->belongsTo(Academy::class);
+    }
+
+    public function courses()
+    {
+        return $this->hasMany(Course::class);
     }
 }
