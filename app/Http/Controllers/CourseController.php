@@ -29,7 +29,14 @@ class CourseController extends Controller
      */
     public function store(StoreCourseRequest $request)
     {
-        //
+
+        $course = Course::create([
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'teacher_id' => $request->input('teacher_id'),
+        ]);
+
+        return response()->json($course, 201);
     }
 
     /**
