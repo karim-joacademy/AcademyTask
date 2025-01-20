@@ -23,7 +23,9 @@ class UpdateAcademyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:academies,email,' . $this->route('academy'),
+            'phone' => 'nullable|string|max:15',
         ];
     }
 }

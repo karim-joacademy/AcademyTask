@@ -18,7 +18,7 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->foreignId('student_id')
                   ->constrained('students')
-                  ->onDelete('restrict');
+                  ->onDelete('cascade');
             $table->timestamps();
         });
     }
