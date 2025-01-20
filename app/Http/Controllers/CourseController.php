@@ -78,7 +78,7 @@ class CourseController extends Controller
     public function update(UpdateCourseRequest $request, int $id) : JsonResponse
     {
         try {
-            $course = Course::findOrFail($id);
+            $course = Course::query()->findOrFail($id);
             $teacher_id = $course->teacher_id;
 
             $course->update([
