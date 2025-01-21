@@ -34,9 +34,9 @@ class TeacherController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTeacherRequest $request)
+    public function store(StoreTeacherRequest $request) : JsonResponse
     {
-        //
+        return response()->json();
     }
 
     /**

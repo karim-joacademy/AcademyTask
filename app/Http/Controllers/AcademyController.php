@@ -31,9 +31,9 @@ class AcademyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAcademyRequest $request)
+    public function store(StoreAcademyRequest $request) : JsonResponse
     {
-        //
+        return response()->json();
     }
 
     /**
@@ -59,7 +59,7 @@ class AcademyController extends Controller
     public function update(UpdateAcademyRequest $request, int $id) : JsonResponse
     {
         try {
-            $academy = Academy::query()->findOrFail($id); // Find academy by ID
+            $academy = Academy::query()->findOrFail($id);
 
             $academy->update([
                 'name' => $request->input('name', $academy->name),
