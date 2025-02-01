@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddCourseRequest;
+use App\Http\Requests\FireStudentRequest;
 use App\Http\Requests\StoreTeacherRequest;
 use App\Http\Requests\StoreCourseRequest;
+use App\Http\Requests\UpdateTeacherRequest;
+use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Course;
 use Illuminate\Http\JsonResponse;
@@ -140,6 +144,71 @@ class TeacherController extends Controller
         catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to delete the teacher.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function fireStudent(FireStudentRequest $request, Teacher $teacher): JsonResponse
+    {
+        try {
+            $course = Course::find($request->input('course_id'));
+
+            if ($course->teacher_id !== $teacher->id) {
+                return response()->json([
+                    'message' => 'You do not have permission to remove students from this course.',
+                ], 403);
+            }
+
+            $student = Student::query()->find($request->input('student_id'));
+
+            if (!$course->students()->where('student_id', $student->id)->exists()) {
+                return response()->json([
+                    'message' => 'The student is not enrolled in this course.',
+                ], 400);
+            }
+
+            $course->students()->detach($student->id);
+
+            return response()->json([
+                'message' => 'Student has been removed from the course successfully.',
+                'student' => $student,
+                'course' => $course,
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while removing the student from the course.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function addCourse(AddCourseRequest $request, Teacher $teacher): JsonResponse
+    {
+        try {
+            // Check if the teacher already has 3 courses
+            if ($teacher->courses()->count() >= 3) {
+                return response()->json([
+                    'message' => 'A teacher cannot have more than 3 courses.',
+                ], 400);
+            }
+
+            // Create the course
+            $course = Course::create([
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+                'teacher_id' => $teacher->id,
+            ]);
+
+            return response()->json([
+                'message' => 'Course added successfully.',
+                'course' => $course,
+            ], 201);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while adding the course.',
                 'error' => $e->getMessage(),
             ], 500);
         }
