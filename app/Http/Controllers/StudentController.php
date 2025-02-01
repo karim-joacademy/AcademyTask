@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
+use App\Models\Course;
 use App\Models\Student;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
@@ -34,9 +36,21 @@ class StudentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreStudentRequest $request) : JsonResponse
+    public function store(StoreStudentRequest $request): JsonResponse
     {
-        return response()->json();
+        try {
+            $student = Student::query()->create($request->validated());
+
+            return response()->json([
+                'message' => 'Student created successfully',
+                'student' => $student
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create student',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -74,7 +88,7 @@ class StudentController extends Controller
             ]);
             return response()->json($student, 200);
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to update the student.',
                 'error' => $e->getMessage(),
@@ -107,4 +121,76 @@ class StudentController extends Controller
             ], 500);
         }
     }
+
+    public function enroll(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'student_id' => 'required|integer|exists:students,id',
+                'course_id' => 'required|integer|exists:courses,id',
+            ]);
+
+            $student = Student::query()->find($validated['student_id']);
+            $course = Course::query()->find($validated['course_id']);
+
+            if ($student->courses()->where('course_id', $course->id)->exists()) {
+                return response()->json(["message" => "Student is already enrolled in this course"], 400);
+            }
+
+            if ($student->courses()->count() >= 5) {
+                return response()->json(["message" => "Student has already enrolled in the maximum of 5 courses"], 400);
+            }
+
+            $student->courses()->attach($course->id);
+
+            return response()->json(["message" => "Student enrolled successfully"], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                "message" => "An error occurred while enrolling the student",
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function drop(Request $request): JsonResponse
+    {
+        try {
+            // Validate the request body
+            $validated = $request->validate([
+                'student_id' => 'required|integer|exists:students,id',
+                'course_id' => 'required|integer|exists:courses,id',
+            ]);
+
+            $student = Student::query()->find($validated['student_id']);
+            $course = Course::query()->find($validated['course_id']);
+
+            if (!$student->courses()->where('course_id', $course->id)->exists()) {
+                return response()->json(["message" => "Student is not enrolled in this course"], 400);
+            }
+
+            $courseCount = $student->courses()->count();
+
+            if ($courseCount == 1) {
+                return response()->json(["message" => "Student cannot drop their only course"], 400);
+            }
+
+            $maxDropCount = floor($courseCount / 2);
+
+            if (($courseCount - 1) <= $maxDropCount) {
+                return response()->json(["message" => "Student cannot drop more than the allowed number of courses"], 400);
+            }
+
+            $student->courses()->detach($course->id);
+
+            return response()->json(["message" => "Student dropped the course successfully"], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                "message" => "An error occurred while dropping the course",
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

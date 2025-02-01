@@ -15,3 +15,7 @@ Route::apiResource('academies', AcademyController::class);
 Route::apiResource('teachers', TeacherController::class);
 Route::apiResource('courses', CourseController::class);
 Route::apiResource('students', StudentController::class);
+
+Route::post('students/enroll', [StudentController::class, 'enroll']);
+Route::post('students/drop', [StudentController::class, 'drop']);
+

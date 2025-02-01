@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTeacherRequest;
-use App\Http\Requests\UpdateTeacherRequest;
+use App\Http\Requests\StoreCourseRequest;
 use App\Models\Teacher;
-use Exception;
+use App\Models\Course;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Exception;
+
 
 class TeacherController extends Controller
 {
@@ -34,10 +37,44 @@ class TeacherController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTeacherRequest $request) : JsonResponse
+    public function store(StoreTeacherRequest $request, CourseController $courseController): JsonResponse
     {
-        return response()->json();
+        try {
+            // Create the teacher
+            $teacher = Teacher::create($request->only(['name', 'email', 'phone', 'academy_id']));
+
+            // Create a course request using the validated data
+            $courseRequest = new StoreCourseRequest([
+                'title' => $request->input('course_title'),
+                'description' => $request->input('course_description'),
+                'teacher_id' => $teacher->id,
+            ]);
+
+            // Call the store method of the CourseController
+            $courseResponse = $courseController->store($courseRequest);
+
+            // Check if the course creation was successful
+            if ($courseResponse->getStatusCode() !== 201) {
+                throw new Exception('Failed to create default course');
+            }
+
+            // Get the created course from the response
+            $course = $courseResponse->getData();
+
+            return response()->json([
+                'message' => 'Teacher created successfully with a course',
+                'teacher' => $teacher,
+                'course' => $course,
+            ], 201);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create teacher or course',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
 
     /**
      * Display the specified resource.
