@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Requests\UpdateCourseRequest;
+use App\Http\Requests\CourseRequests\StoreCourseRequest;
+use App\Http\Requests\CourseRequests\UpdateCourseRequest;
 use App\Models\Course;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -53,7 +53,7 @@ class CourseService
     public function createCourse(StoreCourseRequest $request): array
     {
         try {
-            $course = Course::create([
+            $course = Course::query()->create([
                 'title' => $request->input('title'),
                 'description' => $request->input('description'),
                 'teacher_id' => $request->input('teacher_id'),

@@ -78,7 +78,7 @@ class AcademyService
     public function createAcademy(array $data): array
     {
         try {
-            $academy = Academy::create($data);
+            $academy = Academy::query()->create($data);
 
             return [
                 'success' => true,
@@ -107,7 +107,7 @@ class AcademyService
     public function updateAcademy(int $id, array $data): array
     {
         try {
-            $academy = Academy::find($id);
+            $academy = Academy::query()->find($id);
 
             if (!$academy) {
                 return [
@@ -145,7 +145,7 @@ class AcademyService
     public function deleteAcademy(int $id): array
     {
         try {
-            $academy = Academy::find($id);
+            $academy = Academy::query()->find($id);
 
             if (!$academy) {
                 return [

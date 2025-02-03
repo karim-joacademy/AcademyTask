@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAcademyRequest;
-use App\Http\Requests\UpdateAcademyRequest;
+use App\Http\Requests\AcademyRequests\StoreAcademyRequest;
+use App\Http\Requests\AcademyRequests\UpdateAcademyRequest;
 use App\Services\AcademyService;
 use Exception;
 use Illuminate\Http\JsonResponse;

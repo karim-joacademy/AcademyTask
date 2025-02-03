@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddCourseRequest;
-use App\Http\Requests\FireStudentRequest;
-use App\Http\Requests\StoreTeacherRequest;
-use App\Http\Requests\UpdateTeacherRequest;
+use App\Http\Requests\CourseRequests\AddCourseRequest;
+use App\Http\Requests\StudentRequests\FireStudentRequest;
+use App\Http\Requests\TeacherRequests\StoreTeacherRequest;
+use App\Http\Requests\TeacherRequests\UpdateTeacherRequest;
 use App\Models\Teacher;
 use App\Services\TeacherService;
 use Illuminate\Http\JsonResponse;

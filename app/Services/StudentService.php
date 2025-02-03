@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Http\Requests\StoreStudentRequest;
-use App\Http\Requests\UpdateStudentRequest;
+use App\Http\Requests\StudentRequests\StoreStudentRequest;
+use App\Http\Requests\StudentRequests\UpdateStudentRequest;
 use App\Models\Course;
 use App\Models\Student;
 use Exception;

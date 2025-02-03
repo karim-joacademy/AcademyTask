@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreStudentRequest;
-use App\Http\Requests\UpdateStudentRequest;
-use App\Models\Course;
+use App\Http\Requests\StudentRequests\StoreStudentRequest;
+use App\Http\Requests\StudentRequests\UpdateStudentRequest;
 use App\Models\Student;
 use App\Services\StudentService;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

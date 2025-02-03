@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Http\Requests\AddCourseRequest;
-use App\Http\Requests\FireStudentRequest;
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Requests\StoreTeacherRequest;
-use App\Http\Requests\UpdateTeacherRequest;
+use App\Http\Requests\CourseRequests\AddCourseRequest;
+use App\Http\Requests\CourseRequests\StoreCourseRequest;
+use App\Http\Requests\StudentRequests\FireStudentRequest;
+use App\Http\Requests\TeacherRequests\StoreTeacherRequest;
+use App\Http\Requests\TeacherRequests\UpdateTeacherRequest;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -97,14 +97,15 @@ class TeacherService
             // Create the teacher
             $teacher = Teacher::query()->create($request->only(['name', 'email', 'phone', 'academy_id']));
 
-            // Prepare course data
             $courseData = [
                 'title' => $request->input('course_title'),
                 'description' => $request->input('course_description'),
                 'teacher_id' => $teacher->id,
             ];
 
-            // Create the default course using CourseService
+//            $teacher->courses()->create($courseData);
+//            $teacher->courses()->createMany($courseData);
+
             $course = $this->courseService->createCourse(new StoreCourseRequest($courseData));
 
             if (!$course) {
@@ -264,6 +265,8 @@ class TeacherService
      */
     public function addCourseForTeacher(AddCourseRequest $request, Teacher $teacher): array
     {
+        // if i want to add many courses at one time use (createMany)
+
         try {
             if ($teacher->courses()->count() >= 3) {
                 return [
