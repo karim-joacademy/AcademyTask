@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AuthService;
-use Exception;
+use App\Services\AuthService\IAuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    protected AuthService $authService;
+    protected IAuthService $authService;
 
-    public function __construct(AuthService $authService)
+    public function __construct(IAuthService $authService)
     {
         $this->authService = $authService;
     }

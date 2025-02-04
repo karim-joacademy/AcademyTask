@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\CourseService;
 
 use App\Http\Requests\CourseRequests\StoreCourseRequest;
 use App\Http\Requests\CourseRequests\UpdateCourseRequest;
@@ -8,7 +8,7 @@ use App\Models\Course;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class CourseService
+class CourseService implements ICourseService
 {
     /**
      * Retrieve all courses.

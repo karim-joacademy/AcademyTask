@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\StudentService;
 
 use App\Http\Requests\StudentRequests\StoreStudentRequest;
 use App\Http\Requests\StudentRequests\UpdateStudentRequest;
@@ -10,7 +10,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class StudentService
+class StudentService implements IStudentService
 {
     /**
      * Retrieve all students.

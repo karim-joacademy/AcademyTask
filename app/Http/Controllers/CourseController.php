@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CourseRequests\StoreCourseRequest;
 use App\Http\Requests\CourseRequests\UpdateCourseRequest;
 use App\Models\Course;
-use App\Services\CourseService;
+use App\Services\CourseService\ICourseService;
 use Illuminate\Http\JsonResponse;
 
 class CourseController extends Controller
 {
-    protected CourseService $courseService;
+    protected ICourseService $courseService;
 
-    public function __construct(CourseService $courseService)
+    public function __construct(ICourseService $courseService)
     {
         $this->courseService = $courseService;
     }

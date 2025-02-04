@@ -7,14 +7,15 @@ use App\Http\Requests\StudentRequests\FireStudentRequest;
 use App\Http\Requests\TeacherRequests\StoreTeacherRequest;
 use App\Http\Requests\TeacherRequests\UpdateTeacherRequest;
 use App\Models\Teacher;
-use App\Services\TeacherService;
+use App\Services\TeacherService\ITeacherService;
+use App\Services\TeacherService\TeacherService;
 use Illuminate\Http\JsonResponse;
 
 class TeacherController extends Controller
 {
-    protected TeacherService $teacherService;
+    protected ITeacherService $teacherService;
 
-    public function __construct(TeacherService $teacherService)
+    public function __construct(ITeacherService $teacherService)
     {
         $this->teacherService = $teacherService;
     }

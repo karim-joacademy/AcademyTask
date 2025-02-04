@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\AcademyService;
 
 use App\Models\Academy;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class AcademyService
+class AcademyService implements IAcademyService
 {
     /**
      * @return array

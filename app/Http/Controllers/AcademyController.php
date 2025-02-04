@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AcademyRequests\StoreAcademyRequest;
 use App\Http\Requests\AcademyRequests\UpdateAcademyRequest;
-use App\Services\AcademyService;
+use App\Services\AcademyService\IAcademyService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
 class AcademyController extends Controller
 {
-    protected AcademyService $academyService;
+    protected IAcademyService $academyService;
 
-    public function __construct(AcademyService $academyService)
+    public function __construct(IAcademyService $academyService)
     {
         $this->academyService = $academyService;
     }

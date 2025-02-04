@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\TeacherService;
 
 use App\Http\Requests\CourseRequests\AddCourseRequest;
 use App\Http\Requests\CourseRequests\StoreCourseRequest;
@@ -10,14 +10,16 @@ use App\Http\Requests\TeacherRequests\UpdateTeacherRequest;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Services\AuthService\IAuthService;
+use App\Services\CourseService\ICourseService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class TeacherService
+class TeacherService implements IAuthService
 {
-    protected CourseService $courseService;
+    protected ICourseService $courseService;
 
-    public function __construct(CourseService $courseService)
+    public function __construct(ICourseService $courseService)
     {
         $this->courseService = $courseService;
     }

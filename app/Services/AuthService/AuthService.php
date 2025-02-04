@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\AuthService;
 
 use App\Models\User;
 use Exception;
@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
-class AuthService
+class AuthService implements IAuthService
 {
     /**
      * Handle user registration.
@@ -22,12 +22,14 @@ class AuthService
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email',
-                'password' => 'required|string|min:8|confirmed',
+                'password' => 'required|string',
+                'type' => 'required|string|in:academy,teacher,student',
             ]);
 
             $user = User::query()->create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
+                'type' => $validated['type'],
                 'password' => bcrypt($validated['password']),
             ]);
 
@@ -72,7 +74,7 @@ class AuthService
                 throw new Exception('Invalid credentials');
             }
 
-            $token = $user->createToken('YourAppName')->plainTextToken;
+            $token = $user->createToken('academytask')->plainTextToken;
 
             return [
                 'success' => true,
