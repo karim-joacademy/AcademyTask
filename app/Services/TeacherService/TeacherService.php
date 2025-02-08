@@ -15,7 +15,7 @@ use App\Services\CourseService\ICourseService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class TeacherService implements IAuthService
+class TeacherService implements ITeacherService
 {
     protected ICourseService $courseService;
 
@@ -64,7 +64,7 @@ class TeacherService implements IAuthService
     public function getTeacherDetails(Teacher $teacher): array
     {
         try {
-            $teacherDetails = $teacher->load('academy', 'courses'); // Add relations if needed
+            $teacherDetails = $teacher->load('academy', 'courses');
 
             if (!$teacherDetails) {
                 return [
@@ -96,7 +96,6 @@ class TeacherService implements IAuthService
     public function createTeacherWithCourse(StoreTeacherRequest $request): array
     {
         try {
-            // Create the teacher
             $teacher = Teacher::query()->create($request->only(['name', 'email', 'phone', 'academy_id']));
 
             $courseData = [
@@ -267,8 +266,6 @@ class TeacherService implements IAuthService
      */
     public function addCourseForTeacher(AddCourseRequest $request, Teacher $teacher): array
     {
-        // if i want to add many courses at one time use (createMany)
-
         try {
             if ($teacher->courses()->count() >= 3) {
                 return [

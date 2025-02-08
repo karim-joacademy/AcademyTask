@@ -2,6 +2,8 @@
 
 namespace App\Services\StudentService;
 
+use App\Http\Requests\StudentRequests\DropStudentRequest;
+use App\Http\Requests\StudentRequests\EnrollStudentRequest;
 use App\Http\Requests\StudentRequests\StoreStudentRequest;
 use App\Http\Requests\StudentRequests\UpdateStudentRequest;
 use App\Models\Course;
@@ -84,12 +86,12 @@ class StudentService implements IStudentService
     public function createStudent(StoreStudentRequest $request): array
     {
         try {
-            $student = Student::query()->create($request->validated());
+            $student = Student::query()->create($request->only(['name', 'email', 'phone', 'academy_id']));
 
             return [
                 'success' => true,
                 'message' => 'Student created successfully',
-                'data' => $student,
+                'student' => $student,
             ];
         } catch (Exception $e) {
             Log::error("Error creating student: " . $e->getMessage());
@@ -172,16 +174,13 @@ class StudentService implements IStudentService
      * @param Request $request
      * @return array
      */
-    public function enrollStudentInCourse(Request $request): array
+    public function enrollStudentInCourse(EnrollStudentRequest $request): array
     {
         try {
-            $validated = $request->validate([
-                'student_id' => 'required|integer|exists:students,id',
-                'course_id' => 'required|integer|exists:courses,id',
-            ]);
+            $studentCourse = $request->validated();
 
-            $student = Student::query()->find($validated['student_id']);
-            $course = Course::query()->find($validated['course_id']);
+            $student = Student::query()->find($studentCourse['student_id']);
+            $course = Course::query()->find($studentCourse['course_id']);
 
             if ($student->courses()->where('course_id', $course->id)->exists()) {
                 return [
@@ -224,16 +223,13 @@ class StudentService implements IStudentService
      * @param Request $request
      * @return array
      */
-    public function dropStudentFromCourse(Request $request): array
+    public function dropStudentFromCourse(DropStudentRequest $request): array
     {
         try {
-            $validated = $request->validate([
-                'student_id' => 'required|integer|exists:students,id',
-                'course_id' => 'required|integer|exists:courses,id',
-            ]);
+            $studentCourse = $request->validated();
 
-            $student = Student::query()->find($validated['student_id']);
-            $course = Course::query()->find($validated['course_id']);
+            $student = Student::query()->find($studentCourse['student_id']);
+            $course = Course::query()->find($studentCourse['course_id']);
 
             if (!$student->courses()->where('course_id', $course->id)->exists()) {
                 return [

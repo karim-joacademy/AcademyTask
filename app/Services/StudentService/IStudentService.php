@@ -2,6 +2,8 @@
 
 namespace App\Services\StudentService;
 
+use App\Http\Requests\StudentRequests\DropStudentRequest;
+use App\Http\Requests\StudentRequests\EnrollStudentRequest;
 use App\Http\Requests\StudentRequests\StoreStudentRequest;
 use App\Http\Requests\StudentRequests\UpdateStudentRequest;
 use App\Models\Student;
@@ -55,7 +57,7 @@ interface IStudentService
      * @param Request $request
      * @return array
      */
-    public function enrollStudentInCourse(Request $request): array;
+    public function enrollStudentInCourse(EnrollStudentRequest $request): array;
 
     /**
      * Drop a student from a course.
@@ -63,5 +65,5 @@ interface IStudentService
      * @param Request $request
      * @return array
      */
-    public function dropStudentFromCourse(Request $request): array;
+    public function dropStudentFromCourse(DropStudentRequest $request): array;
 }
