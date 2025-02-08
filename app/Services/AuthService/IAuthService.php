@@ -2,6 +2,8 @@
 
 namespace App\Services\AuthService;
 
+use App\Http\Requests\AuthRequests\LoginRequest;
+use App\Http\Requests\AuthRequests\RegisterRequest;
 use Illuminate\Http\Request;
 
 interface IAuthService
@@ -9,18 +11,18 @@ interface IAuthService
     /**
      * Register a new user.
      *
-     * @param Request $request
+     * @param RegisterRequest $request
      * @return array
      */
-    public function register(Request $request): array;
+    public function register(RegisterRequest $request): array;
 
     /**
      * Handle user login.
      *
-     * @param Request $request
+     * @param LoginRequest $request
      * @return array
      */
-    public function login(Request $request): array;
+    public function login(LoginRequest $request): array;
 
     /**
      * Handle user logout.

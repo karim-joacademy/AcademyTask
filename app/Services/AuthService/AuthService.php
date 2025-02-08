@@ -2,6 +2,8 @@
 
 namespace App\Services\AuthService;
 
+use App\Http\Requests\AuthRequests\LoginRequest;
+use App\Http\Requests\AuthRequests\RegisterRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -10,26 +12,14 @@ use Illuminate\Support\Facades\Log;
 
 class AuthService implements IAuthService
 {
-    /**
-     * Handle user registration.
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function register(Request $request): array
+    public function register(RegisterRequest $request): array
     {
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email',
-                'password' => 'required|string',
-                'type' => 'required|string|in:academy,teacher,student',
-            ]);
+            $validated = $request->validated();
 
             $user = User::query()->create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'type' => $validated['type'],
                 'password' => bcrypt($validated['password']),
             ]);
 
@@ -54,19 +44,10 @@ class AuthService implements IAuthService
         }
     }
 
-    /**
-     * Handle user login.
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function login(Request $request): array
+    public function login(LoginRequest $request): array
     {
         try {
-            $validated = $request->validate([
-                'email' => 'required|string|email|exists:users,email',
-                'password' => 'required|string',
-            ]);
+            $validated = $request->validated();
 
             $user = User::query()->where('email', $validated['email'])->first();
 
@@ -93,6 +74,7 @@ class AuthService implements IAuthService
             ];
         }
     }
+
 
     /**
      * Handle user logout.
