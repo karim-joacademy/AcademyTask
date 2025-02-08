@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Log;
 
 class AuthService implements IAuthService
 {
+    /**
+     * Handle user registeration.
+     *
+     * @param RegisterRequest $request
+     * @return array
+     */
     public function register(RegisterRequest $request): array
     {
         try {
@@ -20,9 +26,10 @@ class AuthService implements IAuthService
             $user = User::query()->create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
+                'type' => $validated['type'],
                 'password' => bcrypt($validated['password']),
             ]);
-
+            $user->assignRole($validated['type']);
             $token = $user->createToken('academytask')->plainTextToken;
 
             return [
@@ -44,6 +51,13 @@ class AuthService implements IAuthService
         }
     }
 
+    
+    /**
+     * Handle user login.
+     *
+     * @param LoginRequest $request
+     * @return array
+     */
     public function login(LoginRequest $request): array
     {
         try {
