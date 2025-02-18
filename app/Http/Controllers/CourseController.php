@@ -2,117 +2,115 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Requests\UpdateCourseRequest;
+use App\Http\Requests\CourseRequests\StoreCourseRequest;
+use App\Http\Requests\CourseRequests\UpdateCourseRequest;
 use App\Models\Course;
-use Exception;
+use App\Services\CourseService\ICourseService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
+    protected ICourseService $courseService;
+
+    public function __construct(ICourseService $courseService)
+    {
+        $this->courseService = $courseService;
+    }
+
     /**
-     * Display a listing of the resource.
+     * Retrieve all courses.
+     *
+     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        try {
-            $courses = Course::all();
+        $result = $this->courseService->getAllCourses();
 
-            if ($courses->isEmpty()) {
-                return response()->json(["message" => "No courses found"], 404);
-            }
-            return response()->json($courses, 200);
-        }
-        catch (Exception $e) {
+        if (!$result['success']) {
             return response()->json([
-                "message" => "An error occurred while retrieving the courses",
-                "error" => $e->getMessage()
-            ], 500);
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
         }
-    }
 
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreCourseRequest $request) : JsonResponse
-    {
-        try {
-            $course = Course::create([
-                'title' => $request->input('title'),
-                'description' => $request->input('description'),
-                'teacher_id' => $request->input('teacher_id'),
-            ]);
-
-            return response()->json($course, 201);
-        }
-        catch (Exception $e) {
-            return response()->json([
-                "message" => "An error occurred while creating the course",
-                "error" => $e->getMessage()
-            ], 500);
-        }
+        return response()->json($result['courses'], 200);
     }
 
     /**
-     * Display the specified resource.
+     * create a course
+     * @param StoreCourseRequest $request
+     * @return JsonResponse
      */
-    public function show(Course $course) : JsonResponse
+    public function store(StoreCourseRequest $request): JsonResponse
     {
-        try {
-            $course->load('teacher');
-            return response()->json($course);
-        }
-        catch (Exception $e) {
+        $result = $this->courseService->createCourse($request);
+
+        if (!$result['success']) {
             return response()->json([
-                "message" => "An error occurred while retrieving the course",
-                "error" => $e->getMessage()
-            ], 500);
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
         }
+
+        return response()->json($result['course'], 201);
     }
 
     /**
-     * Update the specified resource in storage.
+     * retrieve a specific course with a teacher
+     * @param Course $course
+     * @return JsonResponse
      */
-    public function update(UpdateCourseRequest $request, int $id) : JsonResponse
+    public function show(Course $course): JsonResponse
     {
-        try {
-            $course = Course::query()->findOrFail($id);
-            $teacher_id = $course->teacher_id;
+        $result = $this->courseService->getCourseWithTeacher($course);
 
-            $course->update([
-                'title' => $request->input('title', $course->title),
-                'description' => $request->input('description', $course->description),
-                'teacher_id' => $teacher_id,
-            ]);
-            return response()->json($course, 200);
-        }
-        catch (Exception $e) {
+        if (!$result['success']) {
             return response()->json([
-                'message' => 'Failed to update the course.',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
         }
+
+        return response()->json($result['course']);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * update a course
+     * @param UpdateCourseRequest $request
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy(int $id) : JsonResponse
+    public function update(UpdateCourseRequest $request, int $id): JsonResponse
     {
-        try {
-            $course = Course::query()->find($id);
+        $result = $this->courseService->updateCourse($request, $id);
 
-            if (!$course) {
-                return response()->json(["message" => "Course not found"], 404);
-            }
-            $course->delete();
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
+        }
 
-            return response()->json(['message' => 'Course deleted successfully.'], 200);
+        return response()->json($result['course'], 200);
+    }
+
+    /**
+     * delete a course
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $result = $this->courseService->deleteCourse($id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
         }
-        catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage(), 500]);
-        }
+
+        return response()->json(['message' => 'Course deleted successfully'], 200);
     }
 }
+

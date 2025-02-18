@@ -2,215 +2,168 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddCourseRequest;
-use App\Http\Requests\FireStudentRequest;
-use App\Http\Requests\StoreTeacherRequest;
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Requests\UpdateTeacherRequest;
-use App\Models\Student;
+use App\Http\Requests\CourseRequests\AddCourseRequest;
+use App\Http\Requests\StudentRequests\FireStudentRequest;
+use App\Http\Requests\TeacherRequests\StoreTeacherRequest;
+use App\Http\Requests\TeacherRequests\UpdateTeacherRequest;
 use App\Models\Teacher;
-use App\Models\Course;
+use App\Services\TeacherService\ITeacherService;
+use App\Services\TeacherService\TeacherService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Exception;
-
 
 class TeacherController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index() : JsonResponse
-    {
-        try {
-            $teachers = Teacher::all();
+    protected ITeacherService $teacherService;
 
-            if ($teachers->isEmpty()) {
-                return response()->json(["message" => "No teachers"], 404);
-            }
-            return response()->json($teachers);
-        }
-        catch (Exception $e) {
-            return response()->json([
-                "message" => "An error occurred while retrieving the teachers",
-                "error" => $e->getMessage()
-            ], 500);
-        }
+    public function __construct(ITeacherService $teacherService)
+    {
+        $this->teacherService = $teacherService;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Retrieve all teachers.
+     *
+     * @return JsonResponse
      */
-    public function store(StoreTeacherRequest $request, CourseController $courseController): JsonResponse
+    public function index(): JsonResponse
     {
-        try {
-            // Create the teacher
-            $teacher = Teacher::create($request->only(['name', 'email', 'phone', 'academy_id']));
+        $result = $this->teacherService->getAllTeachers();
 
-            // Create a course request using the validated data
-            $courseRequest = new StoreCourseRequest([
-                'title' => $request->input('course_title'),
-                'description' => $request->input('course_description'),
-                'teacher_id' => $teacher->id,
-            ]);
-
-            // Call the store method of the CourseController
-            $courseResponse = $courseController->store($courseRequest);
-
-            // Check if the course creation was successful
-            if ($courseResponse->getStatusCode() !== 201) {
-                throw new Exception('Failed to create default course');
-            }
-
-            // Get the created course from the response
-            $course = $courseResponse->getData();
-
-            return response()->json([
-                'message' => 'Teacher created successfully with a course',
-                'teacher' => $teacher,
-                'course' => $course,
-            ], 201);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to create teacher or course',
-                'error' => $e->getMessage()
-            ], 500);
+        if (!$result['success']) {
+            return response()->json(["message" => $result['message']], 404);
         }
-    }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Teacher $teacher) : JsonResponse
-    {
-        try {
-            $teacher->load('academy', 'courses');
-            return response()->json($teacher);
-        }
-        catch (Exception $e) {
-            return response()->json([
-                "message" => "An error occurred while retrieving the teacher",
-                "error" => $e->getMessage()
-            ], 500);
-        }
+        return response()->json($result['teachers'], 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Store a new teacher and create a default course for them.
+     *
+     * @param StoreTeacherRequest $request
+     * @return JsonResponse
+     */
+    public function store(StoreTeacherRequest $request): JsonResponse
+    {
+        $result = $this->teacherService->createTeacherWithCourse($request);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null
+            ], $result['status']);
+        }
+
+        return response()->json([
+            'message' => 'Teacher created successfully with a course',
+            'teacher' => $result['teacher'],
+            'course' => $result['course'],
+        ], 201);
+    }
+
+    /**
+     * Retrieve details of a specific teacher.
+     *
+     * @param Teacher $teacher
+     * @return JsonResponse
+     */
+    public function show(Teacher $teacher): JsonResponse
+    {
+        $result = $this->teacherService->getTeacherDetails($teacher);
+
+        if (!$result['success']) {
+            return response()->json(["message" => $result['message']], 404);
+        }
+
+        return response()->json($result['teacher'], 200);
+    }
+
+    /**
+     * Update the details of an existing teacher.
+     *
+     * @param UpdateTeacherRequest $request
+     * @param Teacher $teacher
+     * @return JsonResponse
      */
     public function update(UpdateTeacherRequest $request, Teacher $teacher): JsonResponse
     {
-        try {
-            $name = $teacher->name;
-            $academy_id = $teacher->academy_id;
+        $result = $this->teacherService->updateTeacher($request, $teacher);
 
-            $teacher->update([
-                'name' => $name,
-                'academy_id' => $academy_id,
-                'email' => $request->input('email', $teacher->email),
-                'phone' => $request->input('phone', $teacher->phone)
-            ]);
-            return response()->json($teacher, 200);
-        }
-        catch (Exception $e) {
+        if (!$result['success']) {
             return response()->json([
-                'message' => 'Failed to update the teacher.',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null
+            ], $result['status']);
         }
+
+        return response()->json($result['teacher'], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the teacher from the system.
+     *
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy(int $id) : JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        try {
-            $teacher = Teacher::query()->find($id);
+        $result = $this->teacherService->deleteTeacher($id);
 
-            if (!$teacher) {
-                return response()->json([
-                    'message' => 'Teacher not found.',
-                ], 404);
-            }
-            $teacher->delete();
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null
+            ], $result['status']);
+        }
 
-            return response()->json([
-                'message' => 'Teacher deleted successfully.',
-            ], 200);
-        }
-        catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to delete the teacher.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json(['message' => 'Teacher deleted successfully.'], 200);
     }
 
+    /**
+     * Fire a student from a course.
+     *
+     * @param FireStudentRequest $request
+     * @param Teacher $teacher
+     * @return JsonResponse
+     */
     public function fireStudent(FireStudentRequest $request, Teacher $teacher): JsonResponse
     {
-        try {
-            $course = Course::find($request->input('course_id'));
+        $result = $this->teacherService->fireStudentFromCourse($request, $teacher);
 
-            if ($course->teacher_id !== $teacher->id) {
-                return response()->json([
-                    'message' => 'You do not have permission to remove students from this course.',
-                ], 403);
-            }
-
-            $student = Student::query()->find($request->input('student_id'));
-
-            if (!$course->students()->where('student_id', $student->id)->exists()) {
-                return response()->json([
-                    'message' => 'The student is not enrolled in this course.',
-                ], 400);
-            }
-
-            $course->students()->detach($student->id);
-
+        if (!$result['success']) {
             return response()->json([
-                'message' => 'Student has been removed from the course successfully.',
-                'student' => $student,
-                'course' => $course,
-            ], 200);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'An error occurred while removing the student from the course.',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null
+            ], $result['status']);
         }
+
+        return response()->json([
+            'message' => 'Student has been removed from the course successfully.',
+            'student' => $result['student'],
+            'course' => $result['course']
+        ], 200);
     }
 
+    /**
+     * Add a new course for a teacher.
+     *
+     * @param AddCourseRequest $request
+     * @param Teacher $teacher
+     * @return JsonResponse
+     */
     public function addCourse(AddCourseRequest $request, Teacher $teacher): JsonResponse
     {
-        try {
-            // Check if the teacher already has 3 courses
-            if ($teacher->courses()->count() >= 3) {
-                return response()->json([
-                    'message' => 'A teacher cannot have more than 3 courses.',
-                ], 400);
-            }
+        $result = $this->teacherService->addCourseForTeacher($request, $teacher);
 
-            // Create the course
-            $course = Course::create([
-                'title' => $request->input('title'),
-                'description' => $request->input('description'),
-                'teacher_id' => $teacher->id,
-            ]);
-
+        if (!$result['success']) {
             return response()->json([
-                'message' => 'Course added successfully.',
-                'course' => $course,
-            ], 201);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'An error occurred while adding the course.',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null
+            ], $result['status']);
         }
+
+        return response()->json([
+            'message' => 'Course added successfully.',
+            'course' => $result['course']
+        ], 201);
     }
 }

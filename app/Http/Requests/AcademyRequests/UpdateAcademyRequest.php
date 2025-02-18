@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\AcademyRequests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCourseRequest extends FormRequest
+class UpdateAcademyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,9 @@ class UpdateCourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:academies,email,' . $this->route('academy'),
+            'phone' => 'nullable|string|max:15',
         ];
     }
 }

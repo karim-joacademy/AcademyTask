@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\AcademyRequests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateStudentRequest extends FormRequest
+class StoreAcademyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,7 @@ class UpdateStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'nullable|email|unique:students,email,' . $this->route('student'),
-            'phone' => 'nullable|string|max:15',
+            //
         ];
     }
 }

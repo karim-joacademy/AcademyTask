@@ -2,98 +2,121 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAcademyRequest;
-use App\Http\Requests\UpdateAcademyRequest;
-use App\Models\Academy;
+use App\Http\Requests\AcademyRequests\StoreAcademyRequest;
+use App\Http\Requests\AcademyRequests\UpdateAcademyRequest;
+use App\Services\AcademyService\IAcademyService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
 class AcademyController extends Controller
 {
+    protected IAcademyService $academyService;
+
+    public function __construct(IAcademyService $academyService)
+    {
+        $this->academyService = $academyService;
+    }
+
     /**
-     * Display a listing of the resource.
+     * Get all academies.
+     *
+     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        try {
-            $academies = Academy::all();
+        $result = $this->academyService->getAllAcademies();
 
-            if ($academies->isEmpty()) {
-                return response()->json(["message" => "No academies found"], 404);
-            }
-            return response()->json($academies, 200);
-        }
-        catch (Exception $e) {
-            return response()->json(["message" => "An error occurred while retrieving academies", "error" => $e->getMessage()], 500);
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAcademyRequest $request) : JsonResponse
-    {
-        return response()->json();
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Academy $academy): JsonResponse
-    {
-        try {
-            if ($academy === null) {
-                return response()->json(["message" => "No Academy found"], 404);
-            }
-            return response()->json($academy, 200);
-        }
-        catch (Exception $e) {
-            return response()->json(["message" => "An error occurred while retrieving the academy", "error" => $e->getMessage()], 500);
-        }
-    }
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAcademyRequest $request, int $id) : JsonResponse
-    {
-        try {
-            $academy = Academy::query()->findOrFail($id);
-
-            $academy->update([
-                'name' => $request->input('name', $academy->name),
-                'email' => $request->input('email', $academy->email),
-                'phone' => $request->input('phone', $academy->phone),
-            ]);
-
-            return response()->json($academy, 200);
-        }
-        catch (Exception $e) {
+        if (!$result['success']) {
             return response()->json([
-                'message' => 'Failed to update the academy.',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => 'No Academies were found.',
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
         }
+
+        return response()->json($result['academies'], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Store a new academy.
+     *
+     * @param StoreAcademyRequest $request
+     * @return JsonResponse
+     * @throws Exception
      */
-    public function destroy(int $id) : JsonResponse
+    public function store(StoreAcademyRequest $request): JsonResponse
     {
-        try {
-            $academy = Academy::query()->find($id);
+        $result = $this->academyService->createAcademy($request->validated());
 
-            if (!$academy) {
-                return response()->json(["message" => "Academy not found"], 404);
-            }
-            $academy->delete();
+        if (!$result['success']) {
+            return response()->json([
+                'message' => 'Failed to create academy.',
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
+        }
 
-            return response()->json(['message' => 'Academy and all its related records are deleted successfully.'], 200);
+        return response()->json($result['academy'], 201);
+    }
+
+    /**
+     * Get academy by ID.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        $result = $this->academyService->getAcademyById($id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
         }
-        catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage(), 500]);
+
+        return response()->json($result['academy'], 200);
+    }
+
+    /**
+     * Update academy by ID.
+     *
+     * @param UpdateAcademyRequest $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(UpdateAcademyRequest $request, int $id): JsonResponse
+    {
+        $result = $this->academyService->updateAcademy($id, $request->validated());
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
         }
+
+        return response()->json($result['academy'], 200);
+    }
+
+    /**
+     * Delete academy by ID.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $result = $this->academyService->deleteAcademy($id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $result['message'],
+                'error' => $result['error'] ?? null,
+            ], $result['status']);
+        }
+
+        return response()->json([
+            'message' => 'Academy and all of its related fields are deleted successfully.',
+        ], 200);
     }
 }
