@@ -86,12 +86,12 @@ class StudentService implements IStudentService
     public function createStudent(StoreStudentRequest $request): array
     {
         try {
-            $student = Student::query()->create($request->validated());
+            $student = Student::query()->create($request->only(['name', 'email', 'phone', 'academy_id']));
 
             return [
                 'success' => true,
                 'message' => 'Student created successfully',
-                'data' => $student,
+                'student' => $student,
             ];
         } catch (Exception $e) {
             Log::error("Error creating student: " . $e->getMessage());

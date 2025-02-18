@@ -34,23 +34,17 @@ class DatabaseSeeder extends Seeder
         $student = Role::query()->firstOrCreate(['name' => 'student']);
 
         $permissions = [
-            'delete course',
-            'delete teacher',
-            'fire student',
-            'enroll to course',
-            'drop course',
-            'view own course',
-            'view all courses',
-            'view students',
-            'view course students'
+            'delete-course', 'delete-teacher', 'fire-student',
+            'enroll-to-course', 'drop-course', 'view-own-course',
+            'view-all-courses', 'view-students', 'view-course-students'
         ];
 
         foreach ($permissions as $permission) {
             Permission::query()->firstOrCreate(['name' => $permission]);
         }
 
-        $academy->givePermissionTo(['view students', 'delete course', 'delete teacher', 'fire student', 'view own course', 'view all courses']);
-        $teacher->givePermissionTo(['view course students', 'fire student', 'view own course']);
-        $student->givePermissionTo(['enroll to course', 'drop course', 'view own course']);
+        $academy->givePermissionTo(['view-students', 'delete-course', 'delete-teacher', 'fire-student', 'view-own-course', 'view-all-courses']);
+        $teacher->givePermissionTo(['view-course-students', 'fire-student', 'view-own-course']);
+        $student->givePermissionTo(['enroll-to-course', 'drop-course', 'view-own-course']);
     }
 }

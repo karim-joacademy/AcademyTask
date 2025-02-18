@@ -23,10 +23,10 @@ class StoreTeacherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255', // Ensures that the name is required, a string, and does not exceed 255 characters
-            'email' => 'required|email|unique:teachers,email', // Ensures that the email is required, is a valid email, and is unique in the teachers table
-            'phone' => 'required|string|max:15', // Ensures that the phone is required and has a maximum of 15 characters
-            'academy_id' => 'required|exists:academies,id', // Ensures that the academy_id is required and must exist in the academies table
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:teachers,email',
+            'phone' => 'required|string|max:15',
+            'academy_id' => 'required|exists:academies,id',
 
             // Course fields
             'course_title' => 'required|string|max:255',
