@@ -44,9 +44,9 @@ class AuthService implements IAuthService
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'type' => $validated['type'],
-                'phone' => $validated['phone'],
                 'password' => bcrypt($validated['password']),
             ]);
+
             $user->assignRole($validated['type']);
 
             if ($validated['type'] === 'academy') {

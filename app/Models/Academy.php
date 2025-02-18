@@ -11,7 +11,7 @@ class Academy extends Model
     /** @use HasFactory<AcademyFactory> */
     use HasFactory;
 
-    protected $fillable = ['name', 'email', 'phone'];
+    protected $fillable = ['name', 'email', 'phone', 'user_id'];
 
     public function teachers()
     {

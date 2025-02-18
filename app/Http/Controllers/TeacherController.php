@@ -8,7 +8,6 @@ use App\Http\Requests\TeacherRequests\StoreTeacherRequest;
 use App\Http\Requests\TeacherRequests\UpdateTeacherRequest;
 use App\Models\Teacher;
 use App\Services\TeacherService\ITeacherService;
-use App\Services\TeacherService\TeacherService;
 use Illuminate\Http\JsonResponse;
 
 class TeacherController extends Controller

@@ -12,7 +12,9 @@ use App\Services\StudentService\IStudentService;
 use App\Services\StudentService\StudentService;
 use App\Services\TeacherService\ITeacherService;
 use App\Services\TeacherService\TeacherService;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +35,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
-    }
+        $this->app['router']->aliasMiddleware('role', RoleMiddleware::class);    }
 }

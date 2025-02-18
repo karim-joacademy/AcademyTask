@@ -16,8 +16,13 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone');
-            $table->foreignId('academy_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+
+            $table->foreignId('academy_id')->constrained()
+                ->onDelete('cascade');
+
+            $table->foreignId('user_id')->constrained('users')
+                ->onDelete('cascade');
         });
     }
 

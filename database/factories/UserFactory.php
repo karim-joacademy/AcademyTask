@@ -25,21 +25,47 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'password' => static::$password ??= Hash::make('password'),
-            'type' => "student",
+            'name' => fake()->name(), // Default name (can be overridden)
+            'email' => fake()->unique()->safeEmail(), // Default email (can be overridden)
+            'password' => static::$password ??= Hash::make('karim'),
+            'type' => "",
             'remember_token' => Str::random(10)
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Define a state for an academy user.
      */
-    public function unverified(): static
+    public function academy(string $name = null, string $email = null): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            'name' => $name ?? $attributes['name'], // Use provided name or fallback
+            'email' => $email ?? $attributes['email'], // Use provided email or fallback
+            'type' => 'academy',
+        ]);
+    }
+
+    /**
+     * Define a state for a teacher user.
+     */
+    public function teacher(string $name = null, string $email = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => $name ?? $attributes['name'],
+            'email' => $email ?? $attributes['email'],
+            'type' => 'teacher',
+        ]);
+    }
+
+    /**
+     * Define a state for a student user.
+     */
+    public function student(string $name = null, string $email = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => $name ?? $attributes['name'],
+            'email' => $email ?? $attributes['email'],
+            'type' => 'student',
         ]);
     }
 }

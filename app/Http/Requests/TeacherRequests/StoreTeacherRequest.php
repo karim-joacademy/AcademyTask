@@ -28,7 +28,6 @@ class StoreTeacherRequest extends FormRequest
             'phone' => 'required|string|max:15',
             'academy_id' => 'required|exists:academies,id',
 
-            // Course fields
             'course_title' => 'required|string|max:255',
             'course_description' => 'nullable|string',
         ];
