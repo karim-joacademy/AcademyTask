@@ -78,6 +78,16 @@ class AcademyService implements IAcademyService
     public function createAcademy(array $data): array
     {
         try {
+            $existingAcademy = Academy::query()->first();
+
+            if ($existingAcademy) {
+                return [
+                    'success' => false,
+                    'message' => 'You cannot create more academies. An academy already exists.',
+                    'status' => 400,
+                ];
+            }
+
             $academy = Academy::query()->create($data);
 
             return [
@@ -85,7 +95,8 @@ class AcademyService implements IAcademyService
                 'academy' => $academy,
                 'status' => 201,
             ];
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             Log::error("Error creating academy: " . $e->getMessage());
 
             return [

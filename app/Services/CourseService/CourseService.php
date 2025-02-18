@@ -118,7 +118,7 @@ class CourseService implements ICourseService
     public function updateCourse(UpdateCourseRequest $request, int $id): array
     {
         try {
-            $course = Course::find($id);
+            $course = Course::query()->find($id);
 
             if (!$course) {
                 return [
@@ -158,7 +158,7 @@ class CourseService implements ICourseService
     public function deleteCourse(int $id): array
     {
         try {
-            $course = Course::find($id);
+            $course = Course::query()->find($id);
 
             if (!$course) {
                 return [
